@@ -1,0 +1,64 @@
+{% extends 'base.html' %}
+{% block content %}
+<style>
+    body {
+        background: linear-gradient(to right, #00c6ff, #0072ff);
+        font-family: "Poppins", sans-serif;
+    }
+
+    .card {
+        background: rgba(255, 255, 255, 0.85);
+        border-radius: 16px;
+        box-shadow: 0 4px 25px rgba(0, 0, 0, 0.1);
+    }
+</style>
+
+<div class="container py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h3>Welcome, {{ donor.name }}</h3>
+        <a href="{{ url_for('donor_logout') }}" class="btn btn-danger">Logout</a>
+    </div>
+
+    <div class="card p-4 mb-3">
+        <h5>Your Profile</h5>
+        <ul class="list-group">
+            <li class="list-group-item"><b>Mobile:</b> {{ donor.mobile }}</li>
+            <li class="list-group-item"><b>Blood Group:</b> {{ donor.blood_group }}</li>
+            <li class="list-group-item"><b>Organs:</b> {{ donor.organs }}</li>
+            <li class="list-group-item"><b>City:</b> {{ donor.city }}</li>
+            <li class="list-group-item"><b>Available:</b> {{ 'Yes' if donor.available else 'No' }}</li>
+        </ul>
+        <a href="{{ url_for('donor_edit_profile') }}" class="btn btn-outline-primary mt-3">Edit Profile</a>
+    </div>
+    <div class="alert alert-success">
+        🫀 Thank you <strong>{{ donor.name }}</strong> for being a life saver.
+        {% if donor.status == 'Harvested' %}
+        Your organ donation has been successfully allocated.
+        {% elif donor.status == 'Verified' %}
+        Your donation is verified and ready.
+        {% else %}
+        Your registration is under process.
+        {% endif %}
+    </div>
+
+
+    <div class="card p-4">
+        <h5>Notifications</h5>
+        {% if notifications %}
+        <ul class="list-group">
+            {% for n in notifications %}
+            <li class="list-group-item d-flex justify-content-between">
+                {{ n.message }}
+                {% if not n.is_read %}
+                <a href="{{ url_for('mark_notification_read', notification_id=n.id) }}" class="badge bg-success">Mark as
+                    Read</a>
+                {% endif %}
+            </li>
+            {% endfor %}
+        </ul>
+        {% else %}
+        <p class="text-muted">No notifications yet.</p>
+        {% endif %}
+    </div>
+
+    {% endblock %}

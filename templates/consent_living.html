@@ -1,0 +1,21 @@
+<!doctype html><html><head><meta charset="utf-8"><title>Living Donor e-Consent</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"></head>
+<body class="p-4"><div class="container">
+<h2>Living Donor Informed Consent</h2>
+<p>Please review carefully. This is a legal document. Contact your coordinator for clarifications.</p>
+<div class="border p-3 mb-3" style="max-height:300px; overflow:auto;">
+<h5>Risks</h5>
+<ul><li>Surgical risks: bleeding, infection, anesthesia complications.</li>
+<li>Pain and temporary or permanent disability in rare cases.</li>
+<li>Psychosocial impact; counseling will be provided.</li></ul>
+<h5>Legal</h5>
+<ul><li>No financial compensation other than permitted reimbursements.</li>
+<li>Right to withdraw consent up to the point of surgery.</li></ul>
+</div>
+<form method="POST" action="/donor/consent/submit">
+<div class="mb-3"><label>Full name (signature)</label><input name="signed_name" class="form-control" required></div>
+<div class="mb-3"><label>Donor type</label><input name="donor_type" value="living" readonly class="form-control"></div>
+<div class="mb-3"><label>Contact phone</label><input name="contact_phone" class="form-control"></div>
+<div class="mb-3 form-check"><input name="agree" value="yes" class="form-check-input" type="checkbox" id="agree" required><label class="form-check-label" for="agree">I understand and agree</label></div>
+<button class="btn btn-primary" type="submit">Sign & Submit</button>
+</form><hr><a href='/'>Home</a></div></body></html>

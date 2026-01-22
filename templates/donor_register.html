@@ -1,0 +1,162 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<div class="container py-5">
+    <div class="col-md-8 mx-auto card-shadow p-4">
+        <h3 class="text-center mb-4 fw-bold text-light">🩸 Donor Registration</h3>
+
+        <form method="post" onsubmit="return validateForm()">
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label class="form-label" for="donor-name">Full Name</label>
+                    <input id="donor-name" name="name" type="text" class="form-control" required
+                        pattern="[A-Za-z\s]{3,50}" placeholder="Enter your full name"
+                        title="Only letters and spaces allowed (3–50 characters)"
+                        oninput="this.value = this.value.replace(/\b\w/g, c => c.toUpperCase())">
+                </div>
+
+                <div class="col-md-3 mb-3">
+                    <label class="form-label" for="donor-age">Age</label>
+                    <input id="donor-age" name="age" type="number" class="form-control" required min="18" max="120"
+                        placeholder="Enter age" oninput="limitAgeInput(this)">
+
+                </div>
+
+                <div class="col-md-3 mb-3">
+                    <label class="form-label" for="donor-gender">Gender</label>
+                    <select id="donor-gender" name="gender" class="form-select" required>
+                        <option value="" disabled selected>Select</option>
+                        <option>Male</option>
+                        <option>Female</option>
+                        <option>Other</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-4 mb-3">
+                    <label class="form-label" for="donor-blood">Blood Group</label>
+                    <select id="donor-blood" name="blood_group" class="form-select" required>
+                        <option value="" disabled selected>Select</option>
+                        <option>A+</option>
+                        <option>A−</option>
+                        <option>B+</option>
+                        <option>B−</option>
+                        <option>AB+</option>
+                        <option>AB−</option>
+                        <option>O+</option>
+                        <option>O−</option>
+                    </select>
+                </div>
+
+                <div class="col-md-8 mb-3">
+                    <label class="form-label" for="donor-organs">Organs (comma separated)</label>
+                    <input id="donor-organs" name="organs" list="organsList" class="form-control"
+                        placeholder="e.g., Heart, Kidney, Liver" required oninput="
+               this.value = this.value
+                   .split(',')
+                   .map(item => item.trim().replace(/\b\w/g, c => c.toUpperCase()))
+                   .join(', ');
+           ">
+                    <datalist id="organsList">
+                        <option value="Heart">
+                        <option value="Kidney">
+                        <option value="Liver">
+                        <option value="Lungs">
+                        <option value="Pancreas">
+                        <option value="Intestine">
+                        <option value="Cornea">
+                        <option value="Skin">
+                        <option value="Bone Marrow">
+                    </datalist>
+                </div>
+
+            </div>
+
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label class="form-label" for="donor-mobile">Mobile Number</label>
+                    <input id="donor-mobile" type="tel" name="mobile" class="form-control"
+                        placeholder="10-digit mobile number" pattern="[0-9]{10}" maxlength="10"
+                        title="Enter a valid 10-digit mobile number" required>
+                </div>
+
+                <div class="col-md-6 mb-3">
+                    <label class="form-label" for="donor-city">City</label>
+                    <input id="donor-city" name="city" type="text" class="form-control" required
+                        placeholder="Enter your city" oninput="capitalizeCity(this)">
+                </div>
+            </div>
+
+            <!-- ✅ Added Password Field -->
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label class="form-label" for="donor-password">Password</label>
+                    <input id="donor-password" name="password" type="password" class="form-control" required
+                        minlength="6" maxlength="20" placeholder="Enter password"
+                        title="Password must be 6–20 characters long">
+                </div>
+            </div>
+            <!-- ✅ End Password Field -->
+
+            <div class="form-check mb-3">
+                <input class="form-check-input" type="checkbox" name="available" id="available" checked>
+                <label class="form-check-label" for="available">
+                    Available for donation
+                </label>
+            </div>
+
+            <div class="text-center">
+                <button class="btn btn-primary px-4 py-2 w-100" type="submit">Register Donor</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="text-center mt-3">
+    <small class="text-light">
+        Already registered?
+        <a href="{{ url_for('donor_login') }}" class="text-decoration-none fw-semibold text-info">
+            Login here
+        </a>
+    </small>
+</div>
+
+<script>
+    // ✅ Restrict Age: Only numbers, max 3 digits
+    function limitAgeInput(input) {
+        input.value = input.value.replace(/[^0-9]/g, '');
+        if (input.value.length > 3) input.value = input.value.slice(0, 3);
+    }
+
+    // ✅ Capitalize City name
+    function capitalizeCity(input) {
+        let words = input.value.toLowerCase().split(' ');
+        input.value = words.map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
+    }
+
+    // ✅ Validate before submission
+    function validateForm() {
+        const mobile = document.querySelector('[name="mobile"]').value;
+        const age = document.querySelector('[name="age"]').value;
+
+        if (!/^\d{10}$/.test(mobile)) {
+            alert("Please enter a valid 10-digit mobile number.");
+            return false;
+        }
+
+        if (age < 18 || age > 120) {
+            alert("Age must be between 18 and 120.");
+            return false;
+        }
+
+        return true;
+    }
+</script>
+<!-- ✅ Add your JavaScript here (end of template) -->
+<script>
+    document.querySelector('input[name="mobile"]').addEventListener('input', function (e) {
+        this.value = this.value.replace(/[^0-9]/g, '').slice(0, 10);
+    });
+</script>
+{% endblock %}

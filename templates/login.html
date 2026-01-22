@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container py-5">
+
+    <div class="card card-shadow p-4 col-md-5 mx-auto">
+        <h3 class="text-center">Admin Login</h3>
+        <form method="post">
+            <div class="mb-3">
+                <label class="form-label">Username</label>
+                <input name="username" type="text" class="form-control" required pattern="[A-Za-z0-9_]{4,20}"
+                    title="Username must be 4–20 characters long and contain only letters, numbers, or underscores."
+                    placeholder="Enter username">
+            </div>
+
+            <div class="mb-3 position-relative">
+                <label class="form-label">Password</label>
+                <input name="password" type="password" class="form-control" required minlength="8" maxlength="32"
+                    pattern="(?=.*[A-Z])(?=.*[a-z])(?=.*d)(?=.*[@$!%*?&])[A-Za-zd@$!%*?&]{8,32}"
+                    title="Password must include uppercase, lowercase, number, and special character (8–32 characters)."
+                    placeholder="Enter password" id="passwordField">
+
+            </div>
+
+            <button class="btn btn-primary w-100">Login</button>
+        </form>
+
+    </div>
+    {% endblock %}

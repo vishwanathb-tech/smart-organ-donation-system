@@ -1,0 +1,52 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container py-4">
+    <div class="col-md-8 mx-auto card p-4">
+        <h3>Edit Request Details</h3>
+        <form method="post">
+            <div class="mb-3">
+                <label>Patient Name</label>
+                <input name="patient_name" value="{{ recipient.patient_name }}" class="form-control"
+                    oninput="this.value = this.value.replace(/\b\w/g, c => c.toUpperCase())">
+            </div>
+
+            <div class="row">
+                <div class="col-md-4 mb-3">
+                    <label>Age</label>
+                    <input type="number" name="age" value="{{ recipient.age }}" class="form-control" min="1" max="999"
+                        maxlength="3" oninput="if(this.value.length > 3) this.value = this.value.slice(0,3)">
+                </div>
+
+                <select name="blood_group" class="form-control" required>
+                    <option value="">Select Blood Group</option>
+                    {% for bg in ["A+", "A-", "B+", "B-", "O+", "O-", "AB+", "AB-"] %}
+                    <option value="{{ bg }}" {% if recipient.blood_group==bg %}selected{% endif %}>{{ bg }}</option>
+                    {% endfor %}
+                </select>
+                <div class="col-md-4 mb-3">
+                    <label>City</label>
+                    <input name="city" value="{{ recipient.city }}" class="form-control"
+                        oninput="this.value = this.value.replace(/\b\w/g, c => c.toUpperCase())">
+                </div>
+
+            </div>
+            <div class="mb-3">
+                <label>Organ Needed</label>
+                <input name="organ_needed" value="{{ recipient.organ_needed }}" class="form-control"
+                    oninput="this.value = this.value.replace(/\b\w/g, c => c.toUpperCase())">
+            </div>
+
+            <div class="mb-3">
+                <label>Password</label>
+                <input name="password" type="password" class="form-control" placeholder="Enter your password"
+                    minlength="6" required>
+            </div>
+            <div class="mb-3">
+                <label>Notes</label>
+                <textarea name="notes" class="form-control">{{ recipient.notes }}</textarea>
+            </div>
+            <button class="btn btn-primary">Save Changes</button>
+        </form>
+    </div>
+</div>
+{% endblock %}

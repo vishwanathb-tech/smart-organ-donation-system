@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hospital Dashboard </title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body {
+            background-color: #f5f7fa;
+        }
+
+        .navbar {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        .stat-card {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            border-left: 4px solid #667eea;
+        }
+
+        .stat-card h6 {
+            color: #666;
+            font-weight: 500;
+            margin-bottom: 10px;
+        }
+
+        .stat-card .number {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        .table-hover tbody tr:hover {
+            background-color: #f8f9fa;
+        }
+
+        .badge-reported {
+            background-color: #ffc107;
+        }
+
+        .badge-verified {
+            background-color: #28a745;
+        }
+
+        .badge-organs {
+            background-color: #17a2b8;
+        }
+
+        .badge-completed {
+            background-color: #6c757d;
+        }
+
+        .btn-action {
+            padding: 5px 10px;
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <div class="container-fluid">
+            <a class="navbar-brand fw-bold" href="/">🏥 Hospital</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item"><a class="nav-link" href="/hospital/dashboard">Dashboard</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/hospital/report_death">Report Death</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/hospital/logout">Logout</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container-fluid mt-4">
+        <!-- Header -->
+        <div class="row mb-4">
+            <div class="col-md-8">
+                <h2 class="fw-bold">{{ hospital.hospital_name }}</h2>
+                <p class="text-muted">📍 {{ hospital.city }}, {{ hospital.state }} | {{ hospital.registration_number }}
+                </p>
+            </div>
+            <div class="col-md-4 text-end">
+                <div class="dropdown d-inline-block">
+                    <a class="btn btn-success btn-lg dropdown-toggle me-2" href="#" role="button"
+                        data-bs-toggle="dropdown" aria-expanded="false">
+                        👤 Donor
+                    </a>
+
+                    <ul class="dropdown-menu">
+                        <li>
+                            <a class="dropdown-item" href="{{ url_for('donor_register') }}">
+                                ➕ Register Donor
+                            </a>
+                        </li>
+                        <li>
+                            <a class="dropdown-item" href="{{ url_for('donor_login') }}">
+                                🔐 Donor Login
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+
+                <a href="{{ url_for('hospital_report_death') }}" class="btn btn-primary btn-lg">+ Report Death</a>
+            </div>
+        </div>
+
+        <!-- Flashed Messages -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+        {% for category, message in messages %}
+        <div class="alert alert-{{ 'danger' if category == 'danger' else 'warning' if category == 'warning' else 'success' if category == 'success' else 'info' }} alert-dismissible fade show"
+            role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+        {% endfor %}
+        {% endif %}
+        {% endwith %}
+
+        <!-- Statistics -->
+        <div class="row mb-4">
+            <div class="col-md-3">
+                <div class="stat-card">
+                    <h6>📋 Total Reports</h6>
+                    <div class="number">{{ total_reports }}</div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stat-card" style="border-left-color: #ffc107;">
+                    <h6>⏳ Pending Verification</h6>
+                    <div class="number" style="color: #ffc107;">{{ pending_reports }}</div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stat-card" style="border-left-color: #28a745;">
+                    <h6>✓ Verified Reports</h6>
+                    <div class="number" style="color: #28a745;">{{ verified_reports }}</div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stat-card" style="border-left-color: #17a2b8;">
+                    <h6>🫀 Organs Harvested</h6>
+                    <div class="number" style="color: #17a2b8;">{{ organs_harvested }}</div>
+                </div>
+            </div>
+        </div>
+        <!-- Registered Donors Table -->
+        <div class="card mb-4">
+            <div class="card-header bg-light">
+                <h5 class="mb-0">🧑‍⚕️ Registered Donors (This Hospital)</h5>
+            </div>
+
+            <div class="card-body">
+                {% if donors %}
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle">
+                        <thead class="table-light">
+                            <tr>
+                                <th>#</th>
+                                <th>Donor Name</th>
+                                <th>Mobile</th>
+                                <th>Blood Group</th>
+                                <th>Organs</th>
+                                <th>Status</th>
+                                <th>Available</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for donor in donors %}
+                            <tr>
+                                <td>{{ loop.index }}</td>
+                                <td class="fw-bold">{{ donor.name }}</td>
+                                <td>{{ donor.mobile }}</td>
+                                <td>{{ donor.blood_group }}</td>
+                                <td>{{ donor.organs }}</td>
+
+                                <!-- Lifecycle status -->
+                                <td>
+                                    {% if donor.status == 'Registered' %}
+                                    <span class="badge bg-secondary">Registered</span>
+                                    {% elif donor.status == 'Verified' %}
+                                    <span class="badge bg-success">Verified</span>
+                                    {% elif donor.status == 'Harvested' %}
+                                    <span class="badge bg-info">Harvested</span>
+                                    {% endif %}
+                                </td>
+
+                                <!-- Availability -->
+                                <td>
+                                    {% if donor.available %}
+                                    <span class="badge bg-success">Yes</span>
+                                    {% else %}
+                                    <span class="badge bg-danger">No</span>
+                                    {% endif %}
+                                </td>
+
+                                <!-- Actions -->
+                                <td class="text-nowrap">
+
+                                    {% if donor.status == 'Registered' %}
+                                    <a href="{{ url_for('hospital_report_death', donor_id=donor.id) }}"
+                                        class="btn btn-sm btn-outline-warning">
+                                        Report Death
+                                    </a>
+
+                                    {% elif donor.status in ['Reported', 'Harvested'] %}
+                                    <span class="badge bg-info">
+                                        Reported
+                                    </span>
+
+                                    {% elif donor.status == 'Verified' %}
+                                    <a href="{{ url_for('hospital_harvest_donor', donor_id=donor.id) }}"
+                                        class="btn btn-sm btn-outline-success">
+                                        Harvest
+                                    </a>
+
+                                    {% endif %}
+
+                                </td>
+
+
+
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <p class="text-muted text-center py-3">
+                    No donors registered by this hospital yet.
+                </p>
+                {% endif %}
+            </div>
+        </div>
+
+
+        <!-- Death Reports Table -->
+        <div class="card">
+            <div class="card-header bg-light">
+                <h5 class="mb-0">📋 Death Reports</h5>
+            </div>
+            <div class="card-body">
+                {% if death_reports %}
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Donor Name</th>
+                                <th>Donor Mobile</th>
+                                <th>Death Time</th>
+                                <th>Cause</th>
+                                <th>Next of Kin</th>
+                                <th>Status</th>
+                                <th>Organs Harvested</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for report in death_reports %}
+                            <tr>
+                                <td class="fw-bold">{{ report.donor.name }}</td>
+                                <td>{{ report.donor.mobile }}</td>
+                                <td>{{ report.death_time.strftime('%Y-%m-%d %H:%M') }}</td>
+                                <td>{{ report.cause_of_death or 'N/A' }}</td>
+                                <td>
+                                    <small>
+                                        {{ report.next_of_kin_name }}<br>
+                                        {{ report.next_of_kin_mobile }}
+                                    </small>
+                                </td>
+                                <td>
+                                    {% if report.status == 'Reported' %}
+                                    <span class="badge badge-reported">Reported</span>
+                                    {% elif report.status == 'Verified' %}
+                                    <span class="badge badge-verified">Verified</span>
+                                    {% elif report.status == 'Organs-Ready' %}
+                                    <span class="badge badge-organs">Organs Ready</span>
+                                    {% else %}
+                                    <span class="badge badge-completed">Completed</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if report.organs_harvested %}
+                                    <small>{{ report.organs_harvested }}</small>
+                                    {% else %}
+                                    <span class="text-muted">—</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if report.status == 'Reported' %}
+                                    <a href="/hospital/verify_death/{{ report.id }}"
+                                        class="btn btn-sm btn-outline-success btn-action">Verify</a>
+                                    {% endif %}
+                                    {% if report.status == 'Verified' %}
+                                    <a href="/hospital/harvest_organs/{{ report.id }}"
+                                        class="btn btn-sm btn-outline-info btn-action">Harvest</a>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <p class="text-muted text-center py-4">No death reports yet. <a href="/hospital/report_death">Report a
+                        death</a></p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+
+</html>

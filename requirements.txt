@@ -1,0 +1,14 @@
+Flask==3.0.0
+Flask-SQLAlchemy==3.0.2
+Werkzeug==3.0.0
+requests==2.31.0
+SQLAlchemy==2.0.20
+twilio==8.0.0
+itsdangerous==2.1.2
+scikit-learn==1.3.0
+joblib==1.3.1
+pandas==2.2.2
+reportlab==3.8.0
+gunicorn==20.1.0
+python-dotenv==1.0.0
+waitress==2.1.2

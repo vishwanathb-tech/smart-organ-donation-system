@@ -1,0 +1,164 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<style>
+    body {
+        background: linear-gradient(135deg, #e6f7f9, #c7f2ed);
+        font-family: 'Poppins', sans-serif;
+    }
+
+    .learn-container {
+        max-width: 1000px;
+        margin: 50px auto;
+        background: #ffffff;
+        border-radius: 20px;
+        padding: 40px;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+    }
+
+    .section-title {
+        font-weight: 700;
+        font-size: 1.8rem;
+        color: #00897b;
+        margin-bottom: 20px;
+        text-align: center;
+    }
+
+    p,
+    li {
+        color: #333;
+        line-height: 1.6;
+    }
+
+    .highlight {
+        color: #00796b;
+        font-weight: 600;
+    }
+
+    .features {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 20px;
+        margin-top: 30px;
+    }
+
+    .feature-card {
+        background: #f4fbfb;
+        padding: 25px;
+        border-radius: 15px;
+        transition: all 0.3s ease;
+        border-left: 5px solid #009688;
+    }
+
+    .feature-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+    }
+
+    .feature-card h5 {
+        color: #00695c;
+        font-weight: 600;
+    }
+
+    .cta-section {
+        background: linear-gradient(90deg, #00897b, #00796b);
+        color: white;
+        border-radius: 15px;
+        padding: 40px 20px;
+        margin-top: 50px;
+        text-align: center;
+    }
+
+    .cta-section h3 {
+        font-weight: 700;
+        margin-bottom: 10px;
+    }
+
+    .cta-section p {
+        font-size: 1rem;
+        margin-bottom: 20px;
+    }
+
+    .cta-section a {
+        background: white;
+        color: #00695c;
+        padding: 12px 25px;
+        border-radius: 8px;
+        font-weight: 600;
+        text-decoration: none;
+        transition: all 0.3s ease;
+    }
+
+    .cta-section a:hover {
+        background: #004d40;
+        color: white;
+    }
+</style>
+
+<div class="learn-container">
+    <h2 class="section-title">💚 Smart Organ Donation Management System</h2>
+    <p class="text-center">
+        The <span class="highlight">Smart Organ Donation System</span> is a next-generation platform that digitizes and
+        simplifies the organ donation process — securely connecting donors, recipients, and hospitals with
+        transparency and efficiency.
+    </p>
+
+    <div class="mt-4">
+        <h4 class="section-title">🌍 Our Mission</h4>
+        <p>
+            We aim to bridge the gap between <strong>donors and recipients</strong> using technology-driven
+            innovation. The system ensures <strong>accurate organ matching, verified communication, and ethical
+                allocation</strong>,
+            saving countless lives through digital transformation.
+        </p>
+    </div>
+
+    <div class="mt-4">
+        <h4 class="section-title">⚙️ Key Features</h4>
+        <div class="features">
+            <div class="feature-card">
+                <h5>🔐 Secure Registration</h5>
+                <p>Separate role-based registration for donors, recipients, and hospitals with password encryption.</p>
+            </div>
+            <div class="feature-card">
+                <h5>📱 OTP Verification</h5>
+                <p>Ensures user authenticity through mobile-based OTP verification for account creation and reset.</p>
+            </div>
+            <div class="feature-card">
+                <h5>👥 Role Management</h5>
+                <p>Assign permissions for admins, hospitals, and coordinators with ease.</p>
+            </div>
+            <div class="feature-card">
+                <h5>🩸 Smart Matching Algorithm</h5>
+                <p>Automatically matches donors and recipients by organ type, blood group, and city proximity.</p>
+            </div>
+            <div class="feature-card">
+                <h5>📊 Admin Dashboard</h5>
+                <p>Provides centralized analytics and live tracking of ongoing allocations and registrations.</p>
+            </div>
+            <div class="feature-card">
+                <h5>📩 Real-time Notifications</h5>
+                <p>Instant alerts for organ matches, approvals, and critical updates to keep everyone informed.</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="mt-5">
+        <h4 class="section-title">🔄 Workflow Overview</h4>
+        <ol class="list-group list-group-numbered">
+            <li class="list-group-item">User chooses role (Donor, Recipient, or Hospital) and registers securely.</li>
+            <li class="list-group-item">OTP verification confirms authenticity of registration.</li>
+            <li class="list-group-item">Donors list available organs; recipients submit requests.</li>
+            <li class="list-group-item">Hospitals validate details and allocate organs based on compatibility.</li>
+            <li class="list-group-item">Real-time notifications keep all stakeholders updated instantly.</li>
+        </ol>
+    </div>
+
+    <div class="cta-section mt-5">
+        <h3>Ready to Make a Difference?</h3>
+        <p>Be a part of the LifeBridge initiative and help transform lives through organ donation.</p>
+        <a href="{{ url_for('get_started') }}">Get Started Now</a>
+    </div>
+</div>
+
+{% endblock %}

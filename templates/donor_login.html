@@ -1,0 +1,63 @@
+{% extends 'base.html' %}
+{% block content %}
+
+
+<div class="container py-5">
+    <div class="col-md-5 mx-auto card p-4">
+        <h3 class="text-center mb-3">🩸 Donor Login</h3>
+        <form method="post">
+            <div class="mb-3">
+                <label class="form-label">Mobile Number</label>
+                <input name="mobile" type="text" class="form-control" placeholder="Enter registered mobile"
+                    pattern="^[0-9]{10}$" maxlength="10" minlength="10" title="Enter a valid 10-digit mobile number"
+                    required>
+            </div>
+            <!-- ✅ Added Password Field -->
+            <div class="mb-3">
+                <label class="form-label">Password</label>
+                <input name="password" type="password" class="form-control" placeholder="Enter your password"
+                    minlength="6" required>
+            </div>
+
+            <button class="btn btn-primary w-100">Login</button>
+        </form>
+        <div class="text-center mt-3">
+            <p>Not registered yet? <a href="{{ url_for('donor_register') }}">Register here</a></p>
+        </div>
+        <p class="text-center mt-2">
+            <a href="{{ url_for('forgot_password', role='donor') }}">Forgot Password?</a>
+
+        </p>
+    </div>
+</div>
+
+<!-- ✅ Add your JavaScript here (end of template) -->
+<script>
+    document.querySelector('input[name="mobile"]').addEventListener('input', function (e) {
+        this.value = this.value.replace(/[^0-9]/g, '').slice(0, 10);
+    });
+</script>
+{% endblock %}
+
+@app.route('/allocate_donor/<int:donor_id>/<int:recipient_id>', methods=['GET', 'POST'])
+        def allocate_donor(donor_id, recipient_id):
+        donor = Donor.query.get_or_404(donor_id)
+        recipient = RecipientRequest.query.get_or_404(recipient_id)
+
+        # Update allocation logic
+        recipient.status = 'Allocated'
+        recipient.matched_donor_id = donor.id
+        donor.available = False # Mark donor as unavailable
+        db.session.commit()
+
+        # Create notifications for both donor and recipient
+        donor_msg = f"You have been matched with recipient {recipient.patient_name} for {recipient.organ_needed}
+        donation"
+        recipient_msg = f"Good news! Donor {donor.name} has been matched for your {recipient.organ_needed} request"
+
+        create_notification('donor', donor.id, donor_msg)
+        create_notification('recipient', recipient.id, recipient_msg)
+
+        flash(
+        f"Donor {donor.name} successfully allocated to {recipient.patient_name}!", "success")
+        return redirect(url_for('admin', request_id=recipient.id))

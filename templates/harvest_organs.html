@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Harvest Organs - LifeBridge Hospital</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f5f7fa;
+        }
+
+        .navbar {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        .card {
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .form-label {
+            color: #555;
+            font-weight: 500;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+        }
+
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #5568d3 0%, #683a92 100%);
+        }
+
+        .info-box {
+            background: #f0f4ff;
+            border-left: 4px solid #667eea;
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 5px;
+        }
+
+        .organ-checkbox {
+            margin: 10px 0;
+        }
+
+        .organ-item {
+            background: white;
+            padding: 12px;
+            border-radius: 5px;
+            border-left: 3px solid #667eea;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <div class="container-fluid">
+            <a class="navbar-brand fw-bold" href="/">🏥 LifeBridge Hospital</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item"><a class="nav-link" href="/hospital/dashboard">Dashboard</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/hospital/report_death">Report Death</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/hospital/logout">Logout</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-5 mb-5">
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <div class="card">
+                    <div class="card-header bg-light">
+                        <h3 class="mb-0">🫀 Record Organ Harvesting</h3>
+                    </div>
+                    <div class="card-body p-5">
+
+                        {% with messages = get_flashed_messages(with_categories=true) %}
+                        {% if messages %}
+                        {% for category, message in messages %}
+                        <div class="alert alert-{{ 'danger' if category == 'danger' else 'warning' if category == 'warning' else 'success' if category == 'success' else 'info' }} alert-dismissible fade show"
+                            role="alert">
+                            {{ message }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                        {% endfor %}
+                        {% endif %}
+                        {% endwith %}
+
+                        <!-- Donor Information -->
+                        <h5 class="mb-3">👤 Donor Information</h5>
+                        <div class="info-box">
+                            <div class="row mb-3">
+                                <div class="col-md-6">
+                                    <strong>👤 Name:</strong> {{ report.donor.name }}
+                                </div>
+                                <div class="col-md-6">
+                                    <strong>👥 Age:</strong> {{ report.donor.age }} | <strong>🩸 Blood:</strong> {{
+                                    report.donor.blood_group }}
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <strong>🫀 Registered Organs:</strong> {{ report.donor.organs }}
+                                </div>
+                                <div class="col-md-6">
+                                    <strong>📍 City:</strong> {{ report.donor.city }}
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Death Report Summary -->
+                        <h5 class="mb-3 mt-4">💀 Death Report Summary</h5>
+                        <div class="info-box">
+                            <div class="row mb-3">
+                                <div class="col-md-6">
+                                    <strong>⏰ Death Time:</strong> {{ report.death_time.strftime('%Y-%m-%d %H:%M') }}
+                                </div>
+                                <div class="col-md-6">
+                                    <strong>🏥 Hospital:</strong> {{ report.hospital.hospital_name }}
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <strong>🏥 Cause:</strong> {{ report.cause_of_death or 'N/A' }}
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Organ Selection -->
+                        <h5 class="mb-3 mt-4">🫀 Select Organs to Harvest</h5>
+                        <form method="POST" action="/hospital/harvest_organs/{{ report.id }}">
+
+                            <div class="alert alert-warning">
+                                ⚠️ Select only the organs that were successfully harvested and are viable for
+                                transplantation.
+                            </div>
+
+                            <div class="mb-4">
+                                {% set organs = report.donor.organs.split(',') if report.donor.organs else [] %}
+                                {% for organ in organs %}
+                                <div class="organ-item">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" name="organs"
+                                            value="{{ organ.strip() }}" id="organ_{{ loop.index }}">
+                                        <label class="form-check-label" for="organ_{{ loop.index }}">
+                                            <strong>{{ organ.strip() }}</strong>
+                                            <br>
+                                            <small class="text-muted">Ready for transplantation</small>
+                                        </label>
+                                    </div>
+                                </div>
+                                {% else %}
+                                <p class="text-muted">No organs registered for this donor</p>
+                                {% endfor %}
+                            </div>
+
+                            <div class="alert alert-info">
+                                ℹ️ By confirming, you attest that:
+                                <ul class="mb-0 mt-2">
+                                    <li>Selected organs have been medically examined</li>
+                                    <li>Organs meet transplantation standards</li>
+                                    <li>Proper documentation has been completed</li>
+                                    <li>Recipients will be notified immediately</li>
+                                </ul>
+                            </div>
+
+                            <div class="d-grid gap-2 mt-5">
+                                <button type="submit" class="btn btn-success btn-lg">✓ Confirm Harvesting & Notify
+                                    Recipients</button>
+                                <a href="/hospital/dashboard" class="btn btn-outline-secondary btn-lg">Back to
+                                    Dashboard</a>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+
+</html>

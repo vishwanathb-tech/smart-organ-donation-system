@@ -1,0 +1,190 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<style>
+    body {
+        background-image: url("{{ url_for('static', filename='images/bg.jpeg') }}");
+        background-size: cover;
+        background-repeat: no-repeat;
+        background-position: center;
+        background-attachment: fixed;
+        min-height: 100vh;
+        font-family: "Poppins", sans-serif;
+    }
+
+    .main-container {
+        display: flex;
+        justify-content: center;
+        align-items: flex-start;
+        padding: 40px 15px;
+    }
+
+    .card {
+        background: rgba(134, 158, 121, 0.88);
+        border-radius: 18px;
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+        max-width: 950px;
+        width: 100%;
+        padding: 30px;
+    }
+
+    .info-card {
+        background: rgba(159, 181, 190, 0.9);
+        border: 1px solid #28a745;
+        border-radius: 12px;
+        padding: 15px 20px;
+        margin-top: 15px;
+    }
+</style>
+
+<div class="main-container">
+    <div class="card">
+
+        <h4 class="mb-2">
+            Matches for Request #{{ req.id }} —
+            <span class="text-primary">{{ req.organ_needed }}</span>
+        </h4>
+
+        <p class="text-muted">
+            <strong>Patient:</strong> {{ req.patient_name }} |
+            <strong>Blood:</strong> {{ req.blood_group }} |
+            <strong>City:</strong> {{ req.city }}
+        </p>
+
+        <hr>
+
+        <!-- ================= ALREADY ALLOCATED ================= -->
+        {% if donor %}
+        <div class="alert alert-success text-center fs-5 mb-4">
+            ✅ <strong>{{ req.patient_name }}</strong> has been successfully allocated.
+        </div>
+
+        <div class="info-card">
+            <h5>Allocation Details</h5>
+            <ul class="list-unstyled mb-0">
+                <li><strong>Donor Name:</strong> {{ donor.name }}</li>
+                <li><strong>Organ:</strong> {{ req.organ_needed }}</li>
+                <li><strong>Blood Group:</strong> {{ donor.blood_group }}</li>
+
+                {% if hospital %}
+                <hr>
+                <li><strong>Hospital:</strong> {{ hospital.hospital_name }}</li>
+                <li><strong>Hospital Contact:</strong> {{ hospital.mobile }} | {{ hospital.email }}</li>
+                <li><strong>City:</strong> {{ hospital.city }}</li>
+                {% endif %}
+            </ul>
+        </div>
+
+        <!-- ================= MATCHING DONORS ================= -->
+        {% elif matches %}
+        <div class="alert alert-info text-center mb-3">
+            🧩 Found {{ matches|length }} potential donor{{ 's' if matches|length > 1 else '' }}.
+        </div>
+
+        <table class="table table-striped text-center align-middle">
+            <thead class="table-dark">
+                <tr>
+                    <th>Rank</th>
+                    <th>Name</th>
+                    <th>Score</th>
+                    <th>Age</th>
+                    <th>Blood</th>
+                    <th>Organs</th>
+                    <th>City</th>
+                    <th>Hospital</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for m in matches %}
+                {% set d = m.donor %}
+                <tr>
+                    <td>{{ loop.index }}</td>
+                    <td>{{ d.name }}</td>
+                    <td><span class="badge bg-info">{{ m.score }}%</span></td>
+                    <td>{{ d.age }}</td>
+                    <td>{{ d.blood_group }}</td>
+                    <td>{{ d.organs }}</td>
+                    <td>{{ d.city }}</td>
+                    <td>{{ d.hospital.hospital_name if d.hospital else '-' }}</td>
+                    <td>
+                        <button type="button" class="btn btn-success btn-sm" data-bs-toggle="modal"
+                            data-bs-target="#confirmAllocateModal" data-donor-id="{{ d.id }}"
+                            data-donor-name="{{ d.name }}"
+                            data-hospital-name="{{ d.hospital.hospital_name if d.hospital else '' }}"
+                            data-hospital-mobile="{{ d.hospital.mobile if d.hospital else '' }}">
+                            Allocate
+                        </button>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <!-- ================= NO MATCH ================= -->
+        {% else %}
+        <div class="alert alert-warning text-center mt-4 fs-5">
+            ⚠️ No suitable donor found for this request yet.
+        </div>
+        {% endif %}
+
+        <div class="mt-4 text-center">
+            <a href="{{ url_for('admin') }}" class="btn btn-outline-dark btn-sm">
+                ← Back to Admin Dashboard
+            </a>
+        </div>
+    </div>
+</div>
+
+<!-- ================= CONFIRM ALLOCATION MODAL ================= -->
+<div class="modal fade" id="confirmAllocateModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+
+            <div class="modal-header">
+                <h5 class="modal-title">Confirm Allocation</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+
+            <div class="modal-body">
+                <p>
+                    Allocate organ from <strong id="modalDonorName"></strong>
+                    to <strong>{{ req.patient_name }}</strong>
+                </p>
+
+                <p><strong>Hospital:</strong> <span id="modalHospitalName">-</span></p>
+                <p><strong>Contact:</strong> <span id="modalHospitalMobile">-</span></p>
+
+                <small class="text-warning">
+                    Recipient receives hospital contact only.
+                </small>
+            </div>
+
+            <div class="modal-footer">
+                <form id="modalAllocateForm" method="POST">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-success">Confirm Allocate</button>
+                </form>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<script>
+    const requestId = "{{ req.id }}";
+
+    document.getElementById('confirmAllocateModal')
+        .addEventListener('show.bs.modal', function (event) {
+
+            const btn = event.relatedTarget;
+            document.getElementById('modalDonorName').innerText = btn.dataset.donorName;
+            document.getElementById('modalHospitalName').innerText = btn.dataset.hospitalName || '-';
+            document.getElementById('modalHospitalMobile').innerText = btn.dataset.hospitalMobile || '-';
+
+            document.getElementById('modalAllocateForm').action =
+                `/allocate_donor/${btn.dataset.donorId}/${requestId}`;
+        });
+</script>
+
+{% endblock %}

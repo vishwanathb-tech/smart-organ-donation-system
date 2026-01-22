@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Verify Death - LifeBridge Hospital</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f5f7fa;
+        }
+
+        .navbar {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        .card {
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .form-label {
+            color: #555;
+            font-weight: 500;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+        }
+
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #5568d3 0%, #683a92 100%);
+        }
+
+        .info-box {
+            background: #f0f4ff;
+            border-left: 4px solid #667eea;
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <div class="container-fluid">
+            <a class="navbar-brand fw-bold" href="/">🏥 LifeBridge Hospital</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item"><a class="nav-link" href="/hospital/dashboard">Dashboard</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/hospital/report_death">Report Death</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/hospital/logout">Logout</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-5 mb-5">
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <div class="card">
+                    <div class="card-header bg-light">
+                        <h3 class="mb-0">✓ Verify Death Report</h3>
+                    </div>
+                    <div class="card-body p-5">
+
+                        {% with messages = get_flashed_messages(with_categories=true) %}
+                        {% if messages %}
+                        {% for category, message in messages %}
+                        <div class="alert alert-{{ 'danger' if category == 'danger' else 'warning' if category == 'warning' else 'success' if category == 'success' else 'info' }} alert-dismissible fade show"
+                            role="alert">
+                            {{ message }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                        {% endfor %}
+                        {% endif %}
+                        {% endwith %}
+
+                        <!-- Report Details -->
+                        <h5 class="mb-3">📋 Report Details</h5>
+                        <div class="info-box">
+                            <div class="row mb-3">
+                                <div class="col-md-6">
+                                    <strong>👤 Donor Name:</strong> {{ report.donor.name }}
+                                </div>
+                                <div class="col-md-6">
+                                    <strong>📱 Donor Mobile:</strong> {{ report.donor.mobile }}
+                                </div>
+                            </div>
+                            <div class="row mb-3">
+                                <div class="col-md-6">
+                                    <strong>🫀 Organs:</strong> {{ report.donor.organs }}
+                                </div>
+                                <div class="col-md-6">
+                                    <strong>🩸 Blood Group:</strong> {{ report.donor.blood_group }}
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <strong>⏰ Death Time:</strong> {{ report.death_time.strftime('%Y-%m-%d %H:%M') }}
+                                </div>
+                                <div class="col-md-6">
+                                    <strong>🏥 Cause:</strong> {{ report.cause_of_death or 'N/A' }}
+                                </div>
+                            </div>
+                        </div>
+
+                        <h5 class="mb-3 mt-4">👨‍👩‍👧 Next of Kin Details</h5>
+                        <div class="info-box">
+                            <div class="row mb-3">
+                                <div class="col-md-6">
+                                    <strong>👤 Name:</strong> {{ report.next_of_kin_name }}
+                                </div>
+                                <div class="col-md-6">
+                                    <strong>📱 Mobile:</strong> {{ report.next_of_kin_mobile }}
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <strong>👥 Relation:</strong> {{ report.next_of_kin_relation }}
+                                </div>
+                                <div class="col-md-6">
+                                    <strong>📋 Medical Cert:</strong> {{ report.medical_cert_number or 'N/A' }}
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Verification Form -->
+                        <h5 class="mb-3 mt-4">✓ Medical Verification</h5>
+                        <form method="POST" action="/hospital/verify_death/{{ report.id }}">
+                            <div class="mb-3">
+                                <label class="form-label">📝 Verification Notes</label>
+                                <textarea name="notes" class="form-control" rows="4"
+                                    placeholder="Medical findings, organ viability assessment, etc."></textarea>
+                            </div>
+
+                            <div class="alert alert-info">
+                                ℹ️ By verifying this death report, you confirm that:
+                                <ul class="mb-0 mt-2">
+                                    <li>Death has been properly documented</li>
+                                    <li>Medical certificates are authentic</li>
+                                    <li>Organs are viable for transplantation</li>
+                                    <li>Next of kin consent has been obtained</li>
+                                </ul>
+                            </div>
+
+                            <div class="d-grid gap-2 mt-5">
+                                <button type="submit" class="btn btn-success btn-lg">✓ Verify & Proceed to
+                                    Harvesting</button>
+                                <a href="/hospital/dashboard" class="btn btn-outline-secondary btn-lg">Back to
+                                    Dashboard</a>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+
+</html>

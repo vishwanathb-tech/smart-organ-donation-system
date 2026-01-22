@@ -1,0 +1,277 @@
+{% extends 'base.html' %}
+{% block content %}
+<!-- Font Awesome -->
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+
+<style>
+    /* === General Page Styling === */
+    body {
+        background: linear-gradient(to bottom right, #f9fbfd, #e6f8f7);
+        font-family: 'Poppins', sans-serif;
+        color: #222;
+        overflow-x: hidden;
+    }
+
+    /* === Hero Section === */
+    .hero {
+        text-align: center;
+        padding: 100px 20px 60px;
+    }
+
+    .hero h1 {
+        font-size: 3rem;
+        font-weight: 700;
+    }
+
+    .hero span {
+        color: #00796b;
+    }
+
+    .hero p {
+        font-size: 1.2rem;
+        margin-top: 10px;
+        color: #555;
+    }
+
+    .btn-primary-custom {
+        background-color: #004d40;
+        /* ensure sufficient contrast */
+        color: #fff;
+        font-weight: 700;
+        border-radius: 8px;
+        padding: 10px 24px;
+        border: none;
+        transition: all 0.2s ease;
+        box-shadow: 0 6px 18px rgba(0, 77, 64, 0.18);
+    }
+
+    .btn-primary-custom:hover {
+        background-color: #00332c;
+        box-shadow: 0 8px 22px rgba(0, 51, 44, 0.22);
+    }
+
+    .btn-outline-custom {
+        background-color: transparent;
+        border: 2px solid #009688;
+        color: #009688;
+        font-weight: 600;
+        border-radius: 8px;
+        padding: 10px 24px;
+        transition: all 0.3s ease;
+    }
+
+    .btn-outline-custom:hover {
+        background-color: #009688;
+        color: #fff;
+        box-shadow: 0 6px 15px rgba(0, 150, 136, 0.3);
+    }
+
+    /* === Stats Section === */
+    .stats {
+        display: flex;
+        justify-content: center;
+        gap: 25px;
+        flex-wrap: wrap;
+        margin: 40px auto;
+        max-width: 1000px;
+    }
+
+    .stats .card {
+        flex: 1 1 200px;
+        text-align: center;
+        background: #fff;
+        padding: 25px;
+        border-radius: 16px;
+        box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+        transition: 0.3s;
+    }
+
+    .stats .card:hover {
+        transform: translateY(-5px);
+    }
+
+    .stats i {
+        font-size: 40px;
+        color: #00796b;
+        margin-bottom: 15px;
+    }
+
+    .stats h2 {
+        color: #004d40;
+        font-weight: 700;
+        margin-bottom: 5px;
+    }
+
+    /* === How It Works === */
+    .how-it-works {
+        text-align: center;
+        padding: 60px 20px;
+    }
+
+    .how-it-works h2 {
+        font-size: 2rem;
+        margin-bottom: 40px;
+    }
+
+    .how-it-works span {
+        color: #00a6a6;
+    }
+
+    .how-cards {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 20px;
+    }
+
+    .how-cards .card {
+        background: rgba(255, 255, 255, 0.85);
+        border-radius: 16px;
+        padding: 25px;
+        width: 300px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        transition: 0.3s;
+    }
+
+    .how-cards .card:hover {
+        transform: translateY(-5px);
+    }
+
+    .how-cards i {
+        font-size: 35px;
+        color: #00a6a6;
+        margin-bottom: 15px;
+    }
+
+    /* === CTA Section === */
+    .cta {
+        background: linear-gradient(90deg, #00a6a6, #00c6b0);
+        color: #fff;
+        text-align: center;
+        padding: 70px 20px;
+        margin-top: 60px;
+        border-radius: 12px;
+    }
+
+    .cta h2 {
+        font-size: 2rem;
+        margin-bottom: 20px;
+    }
+
+    .cta .btn {
+        background-color: #fff;
+        color: #00a6a6;
+        padding: 12px 35px;
+        border-radius: 8px;
+        font-weight: 600;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+        .stats {
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .how-cards {
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .hero h1 {
+            font-size: 2.2rem;
+        }
+    }
+</style>
+
+<!-- === Hero Section === -->
+<section class="hero">
+    <h1>Save Lives Through <span>Organ Donation</span></h1>
+    <p>Connect donors with recipients, coordinate transplants efficiently, and give the gift of life.</p>
+    <div class="mt-4">
+        <div class="d-flex justify-content-center align-items-center mt-4 gap-3">
+            <a href="{{ url_for('get_started') }}" class="btn btn-primary-custom">Get Started</a>
+            <a href="{{ url_for('learn_more') }}" class="btn btn-outline-custom">Learn More</a>
+        </div>
+    </div>
+</section>
+
+<!-- === Stats Section === -->
+<section class="stats">
+    <div class="card">
+        <i class="fas fa-user-plus"></i>
+        <h2>1,000+</h2>
+        <p>Active Donors</p>
+    </div>
+    <div class="card">
+        <i class="fas fa-heart"></i>
+        <h2>500+</h2>
+        <p>Recipients Waiting</p>
+    </div>
+    <div class="card">
+        <i class="fas fa-hospital"></i>
+        <h2>100+</h2>
+        <p>Partner Hospitals</p>
+    </div>
+    <div class="card">
+        <i class="fas fa-heartbeat"></i>
+        <h2>2,500+</h2>
+        <p>Lives Saved</p>
+    </div>
+</section>
+
+<!-- === How It Works Section === -->
+<section class="how-it-works">
+    <h2>How It <span>Works</span></h2>
+    <div class="how-cards">
+        <div class="card">
+            <i class="fas fa-hand-holding-heart"></i>
+            <h5>For Donors</h5>
+            <p>Register, specify your organs, and provide medical details securely.</p>
+            <ul class="text-start">
+                <li>Easy registration</li>
+                <li>Secure medical records</li>
+                <li>Track your donation status</li>
+            </ul>
+        </div>
+        <div class="card">
+            <i class="fas fa-procedures"></i>
+            <h5>For Recipients</h5>
+            <p>Find matching donors quickly with our advanced matching algorithm.</p>
+            <ul class="text-start">
+                <li>Urgent request system</li>
+                <li>Real-time notifications</li>
+                <li>Blood type compatibility</li>
+            </ul>
+        </div>
+        <div class="card">
+            <i class="fas fa-hospital"></i>
+            <h5>For Hospitals</h5>
+            <p>Report deaths, verify donors, harvest organs, and notify recipients.</p>
+            <ul class="text-start">
+                <li>Death reporting system</li>
+                <li>Medical verification</li>
+                <li>Organ harvesting tracking</li>
+            </ul>
+        </div>
+        <div class="card">
+            <i class="fas fa-user-shield"></i>
+            <h5>For Admins</h5>
+            <p>Oversee donor and recipient records, and ensure smooth system operations.</p>
+            <ul class="text-start">
+                <li>Centralized management</li>
+                <li>Analytics dashboard</li>
+                <li>Donation history tracking</li>
+            </ul>
+        </div>
+    </div>
+</section>
+
+<!-- === CTA Section === -->
+<section class="cta">
+    <h2>Ready to Make a Difference?</h2>
+    <p>Join our community of lifesavers today. Every registration brings hope.</p>
+    <a href="{{ url_for('get_started') }}" class="btn">Join Now</a>
+</section>
+
+{% endblock %}
